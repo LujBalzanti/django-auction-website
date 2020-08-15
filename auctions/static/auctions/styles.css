@@ -11,4 +11,12 @@ a{
     color: #1091c4;
 }
 
-
+input {
+    color: black;
+}
+textarea {
+    color: black;
+}
+option {
+    color: black;
+}

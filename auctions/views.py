@@ -3,8 +3,10 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User, Category, Listing, Bid, Comment
+from . import util
 
 
 def index(request):
@@ -61,3 +63,39 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+@login_required(login_url='/login')
+def createListing(request):
+    if request.method == "POST":
+        title = request.POST["listingTitle"]
+        description = request.POST["listingDescription"]
+        price = request.POST["listingPrice"]
+        selectedCategories = request.POST.getlist("listingCategories")
+        photoUrl = request.POST["listingPhotoUrl"]
+
+        try:
+            tags = []
+            for category in selectedCategories:
+                tags.append(Category.objects.get(tag=category))
+        except Exception as error:
+            return render(request, "auctions/error.html", {
+                "error": error
+            })
+
+        try:
+            newListing = Listing(creator=request.user, title=title, description=description, price=price, photoUrl=photoUrl)
+            newListing.save()
+            for tag in tags:
+                newListing.categories.add(tag)
+        except Exception as error:
+            return render(request, "auctions/error.html", {
+                "error": error
+            })
+
+        return HttpResponseRedirect(reverse("index"))
+    
+    else:
+        categories = Category.objects.all()
+        return render(request, "auctions/createListing.html", {
+            "categories": categories
+        })
