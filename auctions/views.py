@@ -10,7 +10,10 @@ from . import util
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    activeListings = Listing.objects.filter(isActive=True)
+    return render(request, "auctions/index.html", {
+        "activeListings": activeListings,
+    })
 
 
 def login_view(request):
@@ -98,4 +101,60 @@ def createListing(request):
         categories = Category.objects.all()
         return render(request, "auctions/createListing.html", {
             "categories": categories
+        })
+
+def listing(request, id):
+    visitedListing = Listing.objects.get(id=id)
+    categories = visitedListing.categories.all()
+    
+    if request.method == "POST":
+        bidAmount = float(request.POST["listingBid"])
+
+        if visitedListing.highestBid:
+             if bidAmount <= visitedListing.highestBid:
+                return render(request, "auctions/error.html", {
+                    "error": "Your bid was too low"
+                })
+        elif bidAmount <= visitedListing.price:
+            return render(request, "auctions/error.html", {
+                "error": "Your bid was too low"
+            })
+
+        try:
+            newBid = Bid(bidder=request.user, listing=Listing.objects.get(id=id), amount=bidAmount)
+        except Exception as error:
+            return render(request, "auctions/error.html", {
+                "error": error
+            })
+
+        newBid.save()
+        visitedListing.highestBid = bidAmount
+        visitedListing.save()
+
+        util.checkHighest(visitedListing)
+        leadBidder = False
+        
+        for bid in Bid.objects.filter(bidder=request.user.id):
+            if visitedListing.highestBid == bid.amount:
+                leadBidder = True    
+             
+        return render(request, "auctions/listing.html",{
+            "visitedListing": visitedListing,
+            "categories": categories,
+            "leadBidder": leadBidder
+        })
+
+    else:
+
+        util.checkHighest(visitedListing)
+        leadBidder = False
+        
+        for bid in Bid.objects.filter(bidder=request.user.id):
+            if visitedListing.highestBid == bid.amount:
+                leadBidder = True
+
+        return render(request, "auctions/listing.html",{
+            "visitedListing": visitedListing,
+            "categories": categories,
+            "leadBidder": leadBidder
         })

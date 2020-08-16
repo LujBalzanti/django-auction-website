@@ -20,3 +20,15 @@ textarea {
 option {
     color: black;
 }
+
+.listing-img-container {
+    max-height: 300px; 
+    max-width:400px; 
+    min-width: 400px; 
+    min-height: 300px;
+}
+.listing-img {
+    height: 100%; 
+    width: 100%; 
+    object-fit: scale-down;
+}
