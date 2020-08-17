@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class User(AbstractUser):
-    watchlist = models.ManyToManyField("Listing", related_name="listed")
+    watchlist = models.ManyToManyField("Listing", related_name="watchlisted")
     pass
 
 class Category(models.Model):
