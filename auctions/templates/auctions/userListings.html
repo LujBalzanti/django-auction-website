@@ -6,14 +6,14 @@
             <h2 style="text-align: center;">Categories</h2>
             <ul>
                 {% for category in categories %}
-                    <li><a href="{% url 'search' search=category %}"> {{ category }} </a></li>
+                    <li><a href="{% url 'displayUserListingCategory' userCategory=category %}"> {{ category }} </a></li>
                 {% endfor %}
             </ul>
         </div>
         
         <main class="col-10 bd-content">
-            <h2 style="text-align: center;">Active Listings</h2>
-            {% for listing in activeListings %}
+            <h2 style="text-align: center;">Active {{ displayCategory }} Listings</h2>
+            {% for listing in userListings %}
             <div class="container-fluid">
                 <div class="card text-white bg-dark mb-3">
                     <div class="row">

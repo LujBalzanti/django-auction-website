@@ -1,5 +1,4 @@
 body {
-    padding: 10px;
     background-color: #2C2F33;
     color: #e5e5e5;
 }
@@ -31,4 +30,16 @@ option {
     height: 100%; 
     width: 100%; 
     object-fit: scale-down;
+}
+
+.login-error {
+    color: rgb(165, 2, 2);
+    font-weight: bold;
+}
+
+.listing-description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
 }

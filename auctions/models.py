@@ -43,13 +43,17 @@ class Bid(models.Model):
 
 class Comment(models.Model):
     listing = models.ForeignKey(Listing, related_name="comments", on_delete=models.CASCADE)
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True)
     content = models.TextField(max_length=280)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.date)
+        return 'Comment {} by {}'.format(self.content, self.commentor)
 
     def get_deleted_user():
         return User.objects.get(username="deleted")
     
     commentor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(get_deleted_user))
+    class Meta:
+        ordering = ['date']
+    

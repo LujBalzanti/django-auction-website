@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from .forms import CommentForm
 
 from .models import User, Category, Listing, Bid, Comment
 from . import util
@@ -11,10 +12,11 @@ from . import util
 
 def index(request):
     activeListings = Listing.objects.filter(isActive=True)
+    categories = Category.objects.all()
     return render(request, "auctions/index.html", {
         "activeListings": activeListings,
+        "categories": categories
     })
-
 
 def login_view(request):
     if request.method == "POST":
@@ -104,10 +106,13 @@ def createListing(request):
         })
 
 def listing(request, id):
-    httpMethodNames = ["post", "patch", "delete", "put", "postComment"]
+    httpMethodNames = ["post", "delete", "put", "postComment"]
     visitedListing = Listing.objects.get(id=id)
     categories = visitedListing.categories.all()
-    leadBidder = False      
+    leadBidder = False
+    comments = visitedListing.comments.filter(active=True).order_by("-date") 
+    newComment = None  
+    newCommentForm = CommentForm()
 
     if request.method == "POST":
         method = request.POST.get("_method", '')
@@ -124,14 +129,41 @@ def listing(request, id):
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
                 "categories": categories,
-                "leadBidder": leadBidder
+                "leadBidder": leadBidder,
+                "comments": comments,
+                "commentForm": newCommentForm
             })
 
-        elif method == "patch":
-            pass
+        elif method == "postComment":
+            newCommentForm = CommentForm(data=request.POST)
+            if newCommentForm.is_valid():
+                newComment = newCommentForm.save(commit=False)
+                newComment.listing = visitedListing
+                newComment.commentor = request.user
+                newComment.save()
 
-        elif method == "postComment":*
-            pass
+                util.checkHighest(visitedListing)
+        
+                for bid in Bid.objects.filter(bidder=request.user.id):
+                    if visitedListing.highestBid == bid.amount:
+                        leadBidder = True
+                
+                newComment = None  
+                newCommentForm = CommentForm()
+
+                return render(request, "auctions/listing.html",{
+                    "visitedListing": visitedListing,
+                    "categories": categories,
+                    "leadBidder": leadBidder,
+                    "comments": comments,
+                    "commentForm": newCommentForm
+                })
+            else:
+                error = "Comment invalid, limit yourself to 280 characters per comment"
+                return render(request, "auctions/error.html", {
+                "error": error
+            })
+
 
         elif method == "delete":
             user = request.user
@@ -145,7 +177,9 @@ def listing(request, id):
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
                 "categories": categories,
-                "leadBidder": leadBidder
+                "leadBidder": leadBidder,
+                "comments": comments,
+                "commentForm": newCommentForm
             })
   
         elif method == "post":
@@ -181,7 +215,9 @@ def listing(request, id):
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
                 "categories": categories,
-                "leadBidder": leadBidder
+                "leadBidder": leadBidder,
+                "comments": comments,
+                "commentForm": newCommentForm
             })
 
     else:
@@ -194,14 +230,30 @@ def listing(request, id):
         return render(request, "auctions/listing.html",{
             "visitedListing": visitedListing,
             "categories": categories,
-            "leadBidder": leadBidder
+            "leadBidder": leadBidder,
+            "comments": comments,
+            "commentForm": newCommentForm
         })
 
 @login_required(login_url='/login')
 def watchlist(request):
     watchlisted = request.user.watchlist.all()
+    categories = Category.objects.all()
     return render(request, "auctions/watchlist.html", {
-        "watchlisted": watchlisted
+        "watchlisted": watchlisted,
+        "categories": categories,
+        "displayCategory": ""
+    })
+
+@login_required(login_url='/login')
+def watchlistCategory(request, category):
+    categoryID = Category.objects.get(tag=category)
+    watchlisted = request.user.watchlist.filter(categories=categoryID)
+    categories = Category.objects.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlisted": watchlisted,
+        "categories": categories,
+        "displayCategory": category
     })
 
 def categories(request):
@@ -218,8 +270,10 @@ def categories(request):
 
 def displayCategory(request, search):
         try:
+            categories = Category.objects.all()
             tag = Category.objects.get(tag=search)
-            taggedListings = Listing.objects.filter(categories=tag)
+            filterArgs = { 'categories': tag, 'isActive': True}
+            taggedListings = Listing.objects.filter(**filterArgs)
 
         except Exception as error:
             return render(request, "auctions/error.html", {
@@ -228,7 +282,39 @@ def displayCategory(request, search):
         
 
         return render(request, "auctions/displayCategory.html", {
-            "taggedListings": taggedListings
+            "taggedListings": taggedListings,
+            "categories": categories,
+            "displayCategory": search
         })
 
+@login_required(login_url='/login')
+def displayUserListingCategory(request, userCategory):
+    try:
+        categories = Category.objects.all()
+        tag = Category.objects.get(tag=userCategory)
+        filterArgs = { 'categories': tag, 'isActive': True, 'creator': request.user}
+        taggedListings = Listing.objects.filter(**filterArgs)
+
+    except Exception as error:
+        return render(request, "auctions/error.html", {
+            "error": error
+        })
+    
+    return render(request, "auctions/userListings.html", {
+        "userListings": taggedListings,
+        "categories": categories,
+        "displayCategory": userCategory
+    })
+
+
+@login_required(login_url='/login')
+def userListings(request):
+    currentUser = request.user
+    userListings = currentUser.userListings.all()
+    categories = Category.objects.all()
+    return render(request, "auctions/userListings.html", {
+        "userListings": userListings,
+        "categories": categories,
+        "displayCategory": ""
+    })
     

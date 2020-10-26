@@ -1,0 +1,53 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container-fluid">
+        <form action="{% url 'createListing' %}" method="POST">
+                {% csrf_token %}
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                                <label for="listingTitle">Title</label>
+                                <input type="text" class="form-control form-control-lg" name="listingTitle" maxlength="50" placeholder="Listing Title" required>
+                        </div>
+                </div>
+
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                                <label for="listingDescription">Description</label>
+                                <textarea class="form-control" name="listingDescription" rows="8" maxlength="1000" placeholder="Listing Description" required></textarea>
+                        </div>
+                </div>
+
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                                <label for="listingPrice">Starting price in $</label>
+                                <input type="number" step="0.01" min="0" max="9999999" name="listingPrice" placeholder="$0,00" required>
+                        </div>
+                </div>
+
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                        <label for="listingCategories">Select Category (multiple may be selected with control)</label>
+                        <select multiple class="form-control" name="listingCategories" required>
+                        {% for category in categories %}
+                        <option> {{ category }} </option>
+                        {% endfor %}
+                        </select>
+                        </div>
+                </div>
+
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                        <label for="listingPhotoUrl">Photo Url</label>
+                        <input type="text" class="form-control" name="listingPhotoUrl" rows="3"></input>
+                        </div>
+                </div>
+
+                <div class="row justify-content-center">
+                        <div class="form-group col-4">
+                                <button type="submit" class="btn btn-primary mb-2">Create Listing</button>
+                        </div>
+                </div>
+        </form>
+</div>
+{% endblock %}

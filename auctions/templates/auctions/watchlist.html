@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="row flex-x1-nowrap">
+    <div class="col-2 border-right border-secondary">
+        <h2 style="text-align: center;">Categories</h2>
+        <ul>
+            {% for category in categories %}
+                <li><a href="{% url 'watchlistCategory' category=category %}"> {{ category }} </a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <main class="col-10 bd-content">
+        <h2 style="text-align: center;">Your {{ displayCategory }} Watchlist</h2>
+        {% for listing in watchlisted %}
+        <div class="container-fluid">
+            <div class="card text-white bg-dark mb-3">
+                <div class="row">
+                    <div class="listing-img-container col-sm-3">
+                        {% if listing.photoUrl %}
+                        <img class="listing-img card-img-top" src="{{ listing.photoUrl }}" alt="{{ listing }} image">
+                        {% else %}
+                        {% load static %}
+                        <img class="listing-img card-img-top" src="{% static 'auctions/placeholder.png' %}" alt="{{ listing }} image">
+                        {% endif %}
+                    </div>
+                    <div class="card-body col-sm-6">
+                    <h4 class="card-title">{{ listing }}</h4>
+                    <p style="font: caption;">By {{ listing.creator }}</p>
+                    <p class="card-text listing-description">{{ listing.description }}</p>
+                    <p class="card-text"><strong>Starting price: </strong>{{ listing.usd }}</p>
+                    {% if listing.highestBid %}
+                    <p class="card-text"><strong>Active bid: </strong>{{ listing.usdBid }}</p>
+                    {% else %}
+                    <p class="card-text">No active bids</p>
+                    {% endif %}
+                    <a href="{% url 'listing' id=listing.id %}" class="btn btn-primary">Go to listing</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+</div>
+
+    
+{% endblock %}

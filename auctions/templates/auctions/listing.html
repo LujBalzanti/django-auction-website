@@ -1,0 +1,114 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container-fluid">
+    <h2>Listing: {{ visitedListing.title }}</h2>
+    <div class="card text-white bg-dark mb-3">
+        <div class="row">
+            <div class="listing-img-container col-sm-3">
+                {% if visitedListing.photoUrl %}
+                <img class="listing-img card-img-top" src="{{ visitedListing.photoUrl }}" alt="{{ visitedListing.title }} image">
+                {% else %}
+                {% load static %}
+                <img class="listing-img card-img-top" src="{% static 'auctions/placeholder.png' %}" alt="{{ visitedListing.title }} image">
+                {% endif %}
+            </div>
+            <div class="card-body col-9">
+                <h4 class="card-title">Description:</h4>
+                <p class="card-text"> {{ visitedListing.description }}</p>
+                <p class="card-text"><strong>Starting price: </strong>{{ visitedListing.usd }}</p>
+                {% if visitedListing.isActive %}
+                    {% if visitedListing.highestBid %}
+                    <p class="card-text"><strong>Active bid: </strong>{{ visitedListing.usdBid }}</p>
+                    {% else %}
+                    <p class="card-text">No active bids</p>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <p>There have been ({{ visitedListing.bids.all.annotate.count }}) bids. 
+                            {% if leadBidder %}
+                            Your bid is the current bid.
+                            {% else %}
+                            Your bid is not the current bid.
+                            {% endif %}
+                        </p>
+                        <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="_method" value="post">
+                            <div class="form-group">
+                                <label for="listingBid">Your bid: </label>
+                                <input type="number" step="0.01" min="0" max="9999999" name="listingBid" placeholder="$0,00" required>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary mb-2">Place Bid</button>
+                            </div>
+                            </div>
+                        </form>
+                            {% if visitedListing.watchlisted.exists %}
+                            <div>
+                                <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="_method" value="delete">
+                                    <button type="submit" class="btn btn-primary mb-2">Remove from watchlist</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <div>
+                                <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="_method" value="put">
+                                    <button type="submit" class="btn btn-primary mb-2">Add to watchlist</button>
+                                </form>
+                            </div>
+                            {% endif %}
+                    {% else %}
+                    <p>To bid, please <a href="{% url 'login' %}">login</a>.</p>
+                    {% endif %}
+                {% else %}
+                    <h3>This listing has been closed</h3>
+                        {% if leadBidder %}
+                        <h5>You have won this auction for {{ visitedListing.usdBid }}!</h5>
+                        {% elif user.is_authenticated %}
+                        <h5>You did not win this auction</h5>
+                        {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <ul>
+            <h3>Details:</h3>
+                <li>Created by {{ visitedListing.creator }}</li>
+                <li>Categories: 
+                {% for category in categories %}
+                    {{ category }},  
+                {% endfor %}
+                </li>
+                
+        </ul>
+    </div>
+</div>
+{% if user.is_authenticated %}
+<div>
+    <form method="POST" action="{% url 'listing' id=visitedListing.id %}">
+        {{ commentForm}}
+        {% csrf_token %}
+        <input type="hidden" name="_method" value="postComment">
+        <button type="submit" class="btn btn-primary mb-2">Create Comment</button>
+    </form>
+</div>
+{% endif %}
+{% for comment in comments %}
+    <div class="container-fluid">
+        <div class="card text-white bg-dark mb-3">
+            <div class="row">
+                <div class="card-body col-sm-3">
+                <p style="font: caption;">By {{ comment.commentor }}</p>
+                <p class="card-text">{{ comment.content }}</p>
+                <p style="font: caption;" class="card-text">{{ comment.date }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+
+    
+        
+{% endblock %}
