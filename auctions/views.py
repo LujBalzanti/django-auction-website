@@ -106,7 +106,7 @@ def createListing(request):
         })
 
 def listing(request, id):
-    httpMethodNames = ["post", "delete", "put", "postComment"]
+    httpMethodNames = ["post", "delete", "put", "postComment", "close"]
     visitedListing = Listing.objects.get(id=id)
     categories = visitedListing.categories.all()
     leadBidder = False
@@ -120,6 +120,23 @@ def listing(request, id):
         if method == "put":
             user = request.user
             user.watchlist.add(visitedListing)
+            util.checkHighest(visitedListing)
+            
+            for bid in Bid.objects.filter(bidder=request.user.id):
+                if visitedListing.highestBid == bid.amount:
+                    leadBidder = True
+
+            return render(request, "auctions/listing.html",{
+                "visitedListing": visitedListing,
+                "categories": categories,
+                "leadBidder": leadBidder,
+                "comments": comments,
+                "commentForm": newCommentForm
+            })
+
+        elif method == "close":
+            visitedListing.isActive = False
+            visitedListing.save()
             util.checkHighest(visitedListing)
             
             for bid in Bid.objects.filter(bidder=request.user.id):

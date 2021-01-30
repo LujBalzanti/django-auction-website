@@ -1,9 +1,9 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="row flex-x1-nowrap">
+    <div class="row col">
         <div class="col-2 border-right border-secondary">
-            <h2 style="text-align: center;">Categories</h2>
+            <h2 class="categories-Sidebar">Categories</h2>
             <ul>
                 {% for category in categories %}
                     <li><a href="{% url 'displayUserListingCategory' userCategory=category %}"> {{ category }} </a></li>
@@ -11,13 +11,13 @@
             </ul>
         </div>
         
-        <main class="col-10 bd-content">
-            <h2 style="text-align: center;">Active {{ displayCategory }} Listings</h2>
+        <main class="col-8 bd-content offset-md-1">
+            <h1 class="listing-page-title">Your {{ displayCategory }} Listings</h1>
             {% for listing in userListings %}
             <div class="container-fluid">
-                <div class="card text-white bg-dark mb-3">
-                    <div class="row">
-                        <div class="listing-img-container col-sm-3">
+                <div class="card text-white bg-dark mb-2">
+                    <div class="row justify-content-center">
+                        <div class="listing-img-container col-sm-2">
                             {% if listing.photoUrl %}
                             <img class="listing-img card-img-top" src="{{ listing.photoUrl }}" alt="{{ listing }} image">
                             {% else %}
@@ -25,17 +25,26 @@
                             <img class="listing-img card-img-top" src="{% static 'auctions/placeholder.png' %}" alt="{{ listing }} image">
                             {% endif %}
                         </div>
-                        <div class="card-body col-sm-6">
-                        <h4 class="card-title">{{ listing }}</h4>
+                        <div class="card-body col-sm-8">
+                            <div class="row">
+                                <div class="col-9 justify-content-start">
+                                    <a class="card-title listing-title" href="{% url 'listing' id=listing.id %}">{{ listing }}</a>
+                                </div>
+                                <div class="col-3 justify-content-end">
+                                    <a href="{% url 'listing' id=listing.id %}"  class="btn btn-primary">Go to listing</a>
+                                </div>
+                            </div>
                         <p style="font: caption;">By {{ listing.creator }}</p>
-                        <p class="card-text listing-description">{{ listing.description }}</p>
-                        <p class="card-text"><strong>Starting price: </strong>{{ listing.usd }}</p>
-                        {% if listing.highestBid %}
-                        <p class="card-text"><strong>Active bid: </strong>{{ listing.usdBid }}</p>
+                        <p class="card-text listing-card-description">{{ listing.description }}</p>
+                        {% if listing.isActive %}
+                            {% if listing.highestBid %}
+                                <p class="card-text"><span class="card-text listing-price">{{ listing.usdBid }}</span> (active bid)</p>
+                            {% else %}
+                                <p class="card-text"><span class="card-text listing-price">{{ listing.usd }}</span> (starting price)</p>
+                            {% endif %}
                         {% else %}
-                        <p class="card-text">No active bids</p>
+                            <p class="card-text listing-price">This listing has been closed</p>
                         {% endif %}
-                        <a href="{% url 'listing' id=listing.id %}" class="btn btn-primary">Go to listing</a>
                         </div>
                     </div>
                 </div>

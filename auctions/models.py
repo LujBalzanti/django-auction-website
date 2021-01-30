@@ -56,4 +56,4 @@ class Comment(models.Model):
     commentor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(get_deleted_user))
     class Meta:
         ordering = ['date']
-    
+        

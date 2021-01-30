@@ -8,8 +8,8 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <nav class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar bg-dark">
-            <a class="navbar-brand mr-0 mr-md-2"><img alt="E-commerce Website"></a>
+        <nav class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar bg-dark" style="padding-bottom: 15px; padding-top: 15px; margin-bottom: 20px;">
+            <a class="navbar-brand mr-0 mr-md-2 border rounded" href="{% url 'index' %}"><img style="margin-left: 10px; margin-right: 10px;" alt="Logo Placeholder"></a>
           
             <div class="navbar-nav-scroll">
               <ul class="navbar-nav bd-navbar-nav flex-row">
@@ -36,7 +36,7 @@
             <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
                 <span class="navbar-text">
                     {% if user.is_authenticated %}
-                        Signed in as <strong>{{ user.username }}</strong>.
+                        Signed in as <a href="{% url 'userListings' %}">{{ user.username }}</a>
                     {% else %}
                         Not signed in.
                     {% endif %}
