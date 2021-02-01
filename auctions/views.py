@@ -113,6 +113,7 @@ def listing(request, id):
     comments = visitedListing.comments.filter(active=True).order_by("-date") 
     newComment = None  
     newCommentForm = CommentForm()
+    util.checkHighest(visitedListing)
 
     if request.method == "POST":
         method = request.POST.get("_method", '')
@@ -120,7 +121,6 @@ def listing(request, id):
         if method == "put":
             user = request.user
             user.watchlist.add(visitedListing)
-            util.checkHighest(visitedListing)
 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -133,7 +133,6 @@ def listing(request, id):
         elif method == "close":
             visitedListing.isActive = False
             visitedListing.save()
-            util.checkHighest(visitedListing)
             
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -150,8 +149,6 @@ def listing(request, id):
                 newComment.listing = visitedListing
                 newComment.commentor = request.user
                 newComment.save()
-
-                util.checkHighest(visitedListing)
 
                 newComment = None  
                 newCommentForm = CommentForm()
@@ -173,7 +170,6 @@ def listing(request, id):
         elif method == "delete":
             user = request.user
             user.watchlist.remove(visitedListing)
-            util.checkHighest(visitedListing)
 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -206,8 +202,6 @@ def listing(request, id):
             newBid.save()
             visitedListing.highestBid = bidAmount
             visitedListing.save()
-
-            util.checkHighest(visitedListing)
                 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -218,8 +212,6 @@ def listing(request, id):
             })
 
     else:
-        util.checkHighest(visitedListing)
-
         return render(request, "auctions/listing.html",{
             "visitedListing": visitedListing,
             "categories": categories,
