@@ -22,3 +22,10 @@ def checkLeadBidder(userBids, listing):
             return True
     return False
 
+def checkValidBid(listing, newBid):
+    if listing.highestBid:
+        if newBid <= listing.highestBid:
+            return False
+    elif bidAmount <= visitedListing.price:
+        return False
+    return True

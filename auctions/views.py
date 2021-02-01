@@ -183,17 +183,13 @@ def listing(request, id):
             try:
                 bidAmount = float(request.POST["listingBid"])
 
-                if visitedListing.highestBid:
-                    if bidAmount <= visitedListing.highestBid:
-                        return render(request, "auctions/error.html", {
+                if util.checkValidBid(visitedListing, bidAmount):
+                    newBid = Bid(bidder=request.user, listing=Listing.objects.get(id=id), amount=bidAmount)
+                else:
+                    return render(request, "auctions/error.html", {
                             "error": "Your bid was too low"
                         })
-                elif bidAmount <= visitedListing.price:
-                    return render(request, "auctions/error.html", {
-                        "error": "Your bid was too low"
-                    })
 
-                newBid = Bid(bidder=request.user, listing=Listing.objects.get(id=id), amount=bidAmount)
             except Exception as error:
                 return render(request, "auctions/error.html", {
                     "error": error
