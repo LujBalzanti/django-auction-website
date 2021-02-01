@@ -198,6 +198,8 @@ def listing(request, id):
             newBid.save()
             visitedListing.highestBid = bidAmount
             visitedListing.save()
+            
+            util.checkHighest(visitedListing)
                 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
