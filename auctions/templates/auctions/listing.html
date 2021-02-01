@@ -32,7 +32,7 @@
                         </p>
                         <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="_method" value="post">
+                            <input type="hidden" name="_method" value="placeBid">
                             <div class="form-group">
                                 <label for="listingBid">Your bid: </label>
                                 <input type="number" step="0.01" min="0" max="9999999" name="listingBid" placeholder="$0,00" required>
@@ -64,7 +64,7 @@
                         <div>
                             <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
                                 {% csrf_token %}
-                                <input type="hidden" name="_method" value="delete">
+                                <input type="hidden" name="_method" value="removeFromWatchlist">
                                 <button type="submit" class="btn btn-primary mb-2">Remove from watchlist</button>
                             </form>
                         </div>
@@ -72,7 +72,7 @@
                         <div>
                             <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
                                 {% csrf_token %}
-                                <input type="hidden" name="_method" value="put">
+                                <input type="hidden" name="_method" value="addToWatchlist">
                                 <button type="submit" class="btn btn-primary mb-2">Add to watchlist</button>
                             </form>
                         </div>
@@ -83,7 +83,7 @@
                             <div>
                                 <form action="{% url 'listing' id=visitedListing.id %}" method="POST">
                                     {% csrf_token %}
-                                    <input type="hidden" name="_method" value="close">
+                                    <input type="hidden" name="_method" value="closeAuction">
                                     <button type="submit" class="btn btn-primary mb-2">Close Auction</button>
                                 </form>
                             </div>

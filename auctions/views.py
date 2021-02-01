@@ -106,7 +106,7 @@ def createListing(request):
         })
 
 def listing(request, id):
-    httpMethodNames = ["post", "delete", "put", "postComment", "close"]
+    httpMethodNames = ["placeBid", "removeFromWatchlist", "addToWatchlist", "postComment", "closeAuction"]
     visitedListing = Listing.objects.get(id=id)
     categories = visitedListing.categories.all()
     leadBidder = util.checkLeadBidder(Bid.objects.filter(bidder=request.user.id), visitedListing)
@@ -118,7 +118,7 @@ def listing(request, id):
     if request.method == "POST":
         method = request.POST.get("_method", '')
 
-        if method == "put":
+        if method == "addToWatchlist":
             user = request.user
             user.watchlist.add(visitedListing)
 
@@ -130,7 +130,7 @@ def listing(request, id):
                 "commentForm": newCommentForm
             })
 
-        elif method == "close":
+        elif method == "closeAuction":
             visitedListing.isActive = False
             visitedListing.save()
             
@@ -167,7 +167,7 @@ def listing(request, id):
             })
 
 
-        elif method == "delete":
+        elif method == "removeFromWatchlist":
             user = request.user
             user.watchlist.remove(visitedListing)
 
@@ -179,7 +179,7 @@ def listing(request, id):
                 "commentForm": newCommentForm
             })
   
-        elif method == "post":
+        elif method == "placeBid":
             try:
                 bidAmount = float(request.POST["listingBid"])
 
