@@ -26,6 +26,6 @@ def checkValidBid(listing, newBid):
     if listing.highestBid:
         if newBid <= listing.highestBid:
             return False
-    elif newBid <= visitedListing.price:
+    elif newBid <= listing.price:
         return False
     return True
