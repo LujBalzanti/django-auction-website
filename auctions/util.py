@@ -18,3 +18,8 @@ def checkHighest(listing):
     
     return
         
+def checkLeadBidder(userBids, listing):
+    for bid in userBids:
+        if listing.highestBid == bid.amount:
+            return True
+    return False

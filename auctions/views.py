@@ -109,7 +109,7 @@ def listing(request, id):
     httpMethodNames = ["post", "delete", "put", "postComment", "close"]
     visitedListing = Listing.objects.get(id=id)
     categories = visitedListing.categories.all()
-    leadBidder = False
+    leadBidder = util.checkLeadBidder(Bid.objects.filter(bidder=request.user.id), visitedListing)
     comments = visitedListing.comments.filter(active=True).order_by("-date") 
     newComment = None  
     newCommentForm = CommentForm()
@@ -121,10 +121,6 @@ def listing(request, id):
             user = request.user
             user.watchlist.add(visitedListing)
             util.checkHighest(visitedListing)
-            
-            for bid in Bid.objects.filter(bidder=request.user.id):
-                if visitedListing.highestBid == bid.amount:
-                    leadBidder = True
 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -139,10 +135,6 @@ def listing(request, id):
             visitedListing.save()
             util.checkHighest(visitedListing)
             
-            for bid in Bid.objects.filter(bidder=request.user.id):
-                if visitedListing.highestBid == bid.amount:
-                    leadBidder = True
-
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
                 "categories": categories,
@@ -160,11 +152,7 @@ def listing(request, id):
                 newComment.save()
 
                 util.checkHighest(visitedListing)
-        
-                for bid in Bid.objects.filter(bidder=request.user.id):
-                    if visitedListing.highestBid == bid.amount:
-                        leadBidder = True
-                
+
                 newComment = None  
                 newCommentForm = CommentForm()
 
@@ -186,10 +174,6 @@ def listing(request, id):
             user = request.user
             user.watchlist.remove(visitedListing)
             util.checkHighest(visitedListing)
-            
-            for bid in Bid.objects.filter(bidder=request.user.id):
-                if visitedListing.highestBid == bid.amount:
-                    leadBidder = True
 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
