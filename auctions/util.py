@@ -10,11 +10,9 @@ def checkHighest(listing):
         
     for bid in bids:
         if bid.amount > highestBid:
-           highestBid = bid.amount
-    
-    if highestBid != listing.highestBid:
-        listing.highestBid = highestBid
-        listing.save()
+            highestBid = bid.amount
+            listing.highestBid = highestBid
+            listing.save()
     
     return
         
@@ -23,3 +21,4 @@ def checkLeadBidder(userBids, listing):
         if listing.highestBid == bid.amount:
             return True
     return False
+

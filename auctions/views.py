@@ -208,10 +208,6 @@ def listing(request, id):
             visitedListing.save()
 
             util.checkHighest(visitedListing)
-            
-            for bid in Bid.objects.filter(bidder=request.user.id):
-                if visitedListing.highestBid == bid.amount:
-                    leadBidder = True    
                 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
@@ -223,10 +219,6 @@ def listing(request, id):
 
     else:
         util.checkHighest(visitedListing)
-        
-        for bid in Bid.objects.filter(bidder=request.user.id):
-            if visitedListing.highestBid == bid.amount:
-                leadBidder = True
 
         return render(request, "auctions/listing.html",{
             "visitedListing": visitedListing,
