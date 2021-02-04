@@ -199,7 +199,7 @@ def listing(request, id):
             visitedListing.highestBid = bidAmount
             visitedListing.save()
             
-            util.checkHighest(visitedListing)
+            leadBidder = util.checkLeadBidder(Bid.objects.filter(bidder=request.user.id), visitedListing)
                 
             return render(request, "auctions/listing.html",{
                 "visitedListing": visitedListing,
