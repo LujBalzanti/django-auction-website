@@ -89,6 +89,7 @@ def createListing(request):
 
         try:
             newListing = Listing(creator=request.user, title=title, description=description, price=price, photoUrl=photoUrl)
+            newListing.clean_fields()
             newListing.save()
             for tag in tags:
                 newListing.categories.add(tag)
