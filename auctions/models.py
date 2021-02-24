@@ -51,7 +51,7 @@ class Comment(models.Model):
     def __str__(self):
         return 'Comment {} by {}'.format(self.content, self.commentor)
 
-    def get_deleted_user():
+    def get_deleted_user(self):
         return User.objects.get(username="deleted")
     
     commentor = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET(get_deleted_user))
