@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.db import models
 from auctions.models import User, Category, Listing, Bid, Comment 
 from django.forms import ValidationError
 
